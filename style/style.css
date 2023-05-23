@@ -211,4 +211,9 @@ body {
 .fav {
   color: #474747;
   font-size: 22px;
+  border: none;
+  background-color: #3df2dd;
+  width: 100%;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }/*# sourceMappingURL=style.css.map */

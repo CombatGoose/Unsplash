@@ -1,8 +1,15 @@
+let productsStore = [
+
+]
+
 //gallery
 const gallery = document.querySelector('.gallery')
 
 //Button add more
 const more = document.querySelector(".more")
+
+//fav
+const toFav = document.querySelector("#toFav")
 
 //Save components from header
 const headerInput = document.querySelector("#header-input")
@@ -16,11 +23,15 @@ const mainInputButton = document.querySelector("#main-button")
 const APIKey = "36456907-f9dba33cb8484d6b9084cc6b6"
 const url = "https://pixabay.com/api/"
 
+if (!localStorage.getItem('favourite')) {
+    localStorage.setItem('favourite', JSON.stringify([]))
+}
+
 const renderImgCards = (imgStore) => {
     imgStore.forEach(imgCard => {
         gallery.innerHTML += `
-        <div class="photo-card card-id="${imgCard.id}">
-        <p class="fav">Add to favourite</p>
+        <div class="photo-card" card-id="${imgCard.id}">
+        <button class="fav" btn-id="${imgCard.id}">Add to favourite</button>
         <img src="${imgCard.largeImageURL}" class="img" alt="${imgCard.tags}">
         <ul class="photo-list">
             <li class="photo-list-item">
@@ -45,7 +56,40 @@ const renderImgCards = (imgStore) => {
         const fav = document.querySelector(".fav")
         localStorage.setItem("fav", fav)
     })
+
+    const searchText = headerInput.value
+    let fullUrl = `${url}/?key=${APIKey}&orientation=horizontal&per_page=20`
+
+    const addBtns = document.querySelectorAll(".fav")
+
+    addBtns.forEach(btn => {
+        btn.addEventListener('click',() => {
+            const currentId = parseInt(btn.getAttribute('btn-id'))
+
+                let currentProduct = productsStore.filter(product => {
+                    if(product.id == currentId){
+                        return product
+                    }
+                })
+
+            let productsFavourite = JSON.parse(localStorage.getItem('favourite'))
+            productsFavourite = [ 
+                ...productsFavourite,
+                {
+                    ...currentProduct[0]
+                }
+            ]
+            localStorage.setItem('favourite', JSON.stringify(productsFavourite))
+            console.log(localStorage.getItem("favourite"))
+            btn.style.display = 'none'
+        })
+    })
+
 }
+
+toFav.addEventListener('click', () => {
+    window.location.href = "./favourite.html"
+})
 
 //Main function to take information about user's search
 const takeInfo = () => {
@@ -63,7 +107,8 @@ const takeInfo = () => {
         fetch(`${fullUrl}&page=1&q=${searchText}`)
             .then((response) => response.json())
             .then((data) => {
-                renderImgCards(data.hits);
+                productsStore = data.hits
+                renderImgCards(data.hits)
 
   })
     } else {
@@ -98,5 +143,3 @@ const moreCard = () => {
             renderImgCards(data.hits);
         })
 }
-
-more.addEventListener("click", moreCard)
